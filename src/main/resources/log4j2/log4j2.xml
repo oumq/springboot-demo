@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!-- status log4j2内部日志级别, monitorInterval:指定log4j自动重新配置的监测间隔时间 -->
+<configuration status="INFO">
+    <!--全局属性-->
+    <Properties>
+        <!-- 文件输出格式 -->
+        <!--%d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间,输出到毫秒的时间-->
+        <!--%-5level : 输出日志级别，-5表示左对齐并且固定输出5个字符，如果不足在右边补0-->
+        <!--%c : logger的名称(%logger)-->
+        <!--%t : 输出当前线程名称-->
+        <!--%p : 日志输出格式-->
+        <!--%m : 日志内容，即 logger.info("message")-->
+        <!--%n : 换行符-->
+        <!--%C : Java类名(%F)-->
+        <!--%L : 行号-->
+        <!--%M : 方法名-->
+        <!--%l : 输出语句所在的行数, 包括类名、方法名、文件名、行数-->
+        <!--hostName : 本地机器名-->
+        <!--hostAddress : 本地ip地址-->
+        <!--<property name="FORMAT">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level >>> %logger{36} - %msg%n</property>-->
+        <property name="FORMAT">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t-%L] %-5level %logger{36} %L %M - %msg%xEx%n</property>
+        <property name="PATH" value="logs" />
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${FORMAT}"/>
+        </Console>
+        <RollingFile name="debug" fileName="${PATH}/debug/debug.log"
+                     filePattern="${PATH}/debug/debug_%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>\
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${PATH}/debug" maxDepth="1">
+                    <IfFileName glob="debug_*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="info" fileName="${PATH}/info/info.log"
+                     filePattern="${PATH}/info/info_%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>\
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${PATH}/info" maxDepth="1">
+                    <IfFileName glob="info_*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="warn" fileName="${PATH}/warn/warn.log"
+                     filePattern="${PATH}/warn/warn_%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>\
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${PATH}/warn" maxDepth="1">
+                    <IfFileName glob="warn_*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="error" fileName="${PATH}/error/error.log"
+                     filePattern="${PATH}/error/error_%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+                <!--   每个文件最大50M -->
+                <SizeBasedTriggeringPolicy size="50 MB"/>\
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${PATH}/error" maxDepth="1">
+                    <IfFileName glob="error_*.log"/>
+                    <!-- 设置最大保存时间为15天-->
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="debug"/>
+            <AppenderRef ref="info"/>
+            <AppenderRef ref="warn"/>
+            <AppenderRef ref="error"/>
+        </Root>
+    </Loggers>
+
+</configuration>
